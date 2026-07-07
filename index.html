@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>جاري التوجيه...</title>
+</head>
+<body>
+
+<script>
+// ============================================================
+// 🔗 الرابط المحمي (عدل هذا الرابط)
+// ============================================================
+const TARGET_URL = 'https://example.com/your-protected-content';
+const BLOCKED_URL = 'https://example.com/blocked';
+
+// ============================================================
+// 📋 البوتات الممنوعة
+// ============================================================
+const BLOCKED_BOTS = [
+    'facebookexternalhit', 'facebot',
+    'googlebot', 'google-inspectiontool', 'adsbot-google',
+    'mediapartners-google', 'googleother',
+    'bingbot', 'adidxbot',
+    'duckduckbot', 'applebot', 'yandexbot', 'baiduspider',
+    'petalbot', 'twitterbot', 'linkedinbot', 'slackbot',
+    'discordbot', 'skypeuripreview', 'telegrambot',
+    'pinterestbot', 'semrushbot', 'ahrefsbot', 'mj12bot',
+    'dotbot', 'ccbot', 'bytespider'
+];
+
+const ALLOWED_BOTS = ['fban', 'fbav', 'fb_iab', 'messenger', 'instagram', 'whatsapp'];
+
+// ============================================================
+// 🛡️ كشف البوتات (بدون واجهة)
+// ============================================================
+function isBot() {
+    const ua = navigator.userAgent.toLowerCase();
+    
+    // فحص البوتات المسموحة
+    for (let bot of ALLOWED_BOTS) {
+        if (ua.includes(bot)) return false;
+    }
+    
+    // فحص البوتات الممنوعة
+    for (let bot of BLOCKED_BOTS) {
+        if (ua.includes(bot)) return bot;
+    }
+    
+    // فحص كلمات عامة
+    const words = ['crawler', 'spider', 'scraper'];
+    for (let word of words) {
+        if (ua.includes(word) && !ua.includes('chrome') && !ua.includes('firefox')) {
+            return word;
+        }
+    }
+    
+    // فحص خصائص المتصفح
+    let score = 0;
+    
+    try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!gl) score += 15;
+    } catch(e) { score += 15; }
+    
+    try {
+        localStorage.setItem('_t', '1');
+        localStorage.removeItem('_t');
+    } catch(e) { score += 10; }
+    
+    const w = window.screen.width;
+    const h = window.screen.height;
+    if (w === 0 || h === 0) score += 20;
+    if (w < 200 || h < 200) score += 10;
+    if (performance.now() < 50) score += 10;
+    if (ua.includes('headless') || ua.includes('puppeteer') || ua.includes('playwright')) score += 30;
+    
+    if (score >= 40) return 'suspicious_bot';
+    
+    return false;
+}
+
+// ============================================================
+// 🚀 التوجيه الفوري (بدون واجهة)
+// ============================================================
+const bot = isBot();
+
+if (bot) {
+    // بوت - منع الوصول فوراً
+    document.write('🚫 تم منع البوت');
+    if (BLOCKED_URL && BLOCKED_URL !== 'https://example.com/blocked') {
+        window.location.href = BLOCKED_URL;
+    }
+} else {
+    // مستخدم حقيقي - توجيه فوري
+    window.location.href = TARGET_URL;
+}
+</script>
+
+</body>
+</html>
